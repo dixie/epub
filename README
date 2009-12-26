@@ -1,0 +1,14 @@
+1. OPS (xhtml)
+2. OPF (packaging) 
+   .opf (manifest, items, metadata)
+   .ncx (chapters)
+3. OEBPS (container/zip)
+    container.xml
+
+---------------------------------------
+
+Data Types Libraries for representing
+about structure and it serialization
+to given output.
+
+
