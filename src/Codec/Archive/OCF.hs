@@ -1,10 +1,13 @@
+-- | Open Container Format 1.0
+
 module OCF(
 	OCF(..),
 	RootItem(..),
-	defaultMimetype,
 	emptyOCF,
 	addRootItem,
-	addFile
+	addFile,
+	defaultMediatype,
+	defaultMimetype
        )
 where
 
