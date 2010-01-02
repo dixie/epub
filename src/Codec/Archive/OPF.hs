@@ -9,24 +9,55 @@ where
 import Text.XML.Light
 
 data OPF = OPF { 
-              opfBookID    :: String,
-              opfBookTitle :: String,
-	      opfLang      :: String,
-              opfEntries   :: [OPFEntry]
+              opfBookID     :: String,
+              opfBookTitle  :: String,
+              opfBookAuthor :: String,
+	      opfLang       :: String,
+              opfEntries    :: [OPFEntry]
            } deriving Show
 
 data OPFEntry = OPFEntry { 
 	            opfeID        :: String,
 		    opfeHRef      :: String,
-		    opfeMediaType :: String
-	        } deriving Show
+		    opfeMediaType :: String }
+              | OPFEntryChapter { 
+	            opfeID            :: String,
+		    opfeHRef          :: String,
+		    opfeMediaType     :: String,
+                    opfeChapterName   :: String } deriving Show
 
 opfDefaultLang = "en"
 opfDefaultCreator = "Unknown"
 
-mkNCXXML :: OPF -> String
-mkNCXXML o = error "not implemented"
+chapterEntries :: [OPFEntry] -> [OPFEntry]
+chapterEntries = filter (isChapter)
+   where
+      isChapter (OPFEntryChapter _ _ _ _) = True
+      isChapter _ = False
 
+mkNCXXML :: OPF -> String
+mkNCXXML o = ppTopElement packageT
+	where
+	   packageT= add_attrs packageA $ unode "ncx" nestedT
+           packageA = [ (Attr (unqual "version") "2005-1")
+                       ,(Attr (unqual "xml:lang") "en")
+	               ,(Attr (unqual "xmlns")   "http://www.daisy.org/z3986/2005/ncx/") ]
+           nestedT = [ headT, docTitleT, docAuthorT, navMapT ]
+           headT = unode "head" $ map (\(n,v) -> add_attrs [ (Attr (unqual "name") n),(Attr (unqual "content") v)] $ unode "meta" ()) metaVals
+           metaVals = [ ("dtb:uid",(opfBookID o))
+                       ,("dtb:depth","1")
+                       ,("dtb:totalPageCount","0") 
+                       ,("dtb:maxPageNumber","0") ]
+           docTitleT = unode "docTitle" $ unode "text" (opfBookTitle o)
+           docAuthorT = unode "docAuthor" $ unode "text" (opfBookAuthor o)
+           numChapterEnt = zip (chapterEntries $ opfEntries o) [1..]
+           navMapT = unode "navMap" (map navPointT numChapterEnt)
+           navPointT (e,i) = add_attrs [ (Attr (unqual "class") "chapter") 
+                                        ,(Attr (unqual "id") (opfeID e))
+                                        ,(Attr (unqual "playOrder") (show i)) 
+                                      ] $ unode "navPoint" [ unode "navLabel" $ unode "text" (opfeChapterName e)
+                                                            ,add_attr (Attr (unqual "src") (opfeHRef e) ) $ unode "content" ()
+					  	           ]
 
 mkOPFXML :: OPF -> String
 mkOPFXML o = ppTopElement packageT
