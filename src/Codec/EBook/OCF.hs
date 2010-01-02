@@ -13,7 +13,7 @@ where
 
 import Text.XML.Light
 import Codec.Archive.Zip
-import qualified Data.ByteString.Lazy as B
+import qualified Data.ByteString.Lazy.Internal as B
 
 defaultMediatype = "application/oebps-package+xml"
 defaultMimetype = "application/epub+zip"
