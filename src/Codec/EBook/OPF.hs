@@ -1,6 +1,6 @@
 -- Open Packaging Format 2.0
 
-module OPF (
+module Codec.EBook.OPF (
         OPF(..),
         OPFEntry(..),
 	mkOPFXML

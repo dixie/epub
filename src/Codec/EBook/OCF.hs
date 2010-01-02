@@ -1,6 +1,6 @@
 -- | Open Container Format 1.0
 
-module OCF(
+module Codec.EBook.OCF(
 	OCF(..),
 	RootItem(..),
 	emptyOCF,
