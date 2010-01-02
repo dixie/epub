@@ -42,14 +42,6 @@ addFile o f c = o { ocfEntries = ets }
        where
            ets = (toEntry f 0 c):(ocfEntries o)
 
-{-
-<?xml version="1.0"?>
-<container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">
-   <rootfiles>
-      <rootfile full-path="content.opf" media-type="application/oebps-package+xml"/>
-   </rootfiles>
-</container>
--}
 mkContainerXML :: OCF -> String
 mkContainerXML o = ppTopElement contTag
 	where
