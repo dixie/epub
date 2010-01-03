@@ -4,22 +4,23 @@ module Codec.EBook (
     module Codec.EBook.Types,
     module Codec.EBook.OPF,
     module Codec.EBook.OCF,
-    book2ByteString,
-    book2OCF,
-    book2OPF
+    book2Str,
 ) 
 where
 
+import Codec.Archive.Zip
 import Codec.EBook.Types
 import Codec.EBook.OPF
 import Codec.EBook.OCF
-import qualified Data.ByteString.Lazy.Internal as B
+import qualified Data.ByteString.Lazy as B
 
-book2ByteString :: Book -> B.ByteString
-book2ByteString book = undefined
-
-book2OCF :: Book -> OCF
-book2OCF book = undefined
-
-book2OPF :: Book -> OPF
-book2OPF book = undefined
+book2Str :: Book -> B.ByteString
+book2Str book = let ncxXMLFile = ("book.ncx",ncxXML book)
+                    opfXMLFile = ("book.opf",opfXML book)
+                    conXMLFile = containerXMLFile' "book.opf"
+                    mimeFile   = mimetypeFile
+                    contFiles  = bookFiles book
+                    allFiles   = mimeFile:ncxXMLFile:conXMLFile:opfXMLFile:contFiles
+                    entries    = map (\(n,c) -> toEntry n 0 c) allFiles
+                    arch       = foldl (\a e -> addEntryToArchive e a) emptyArchive entries
+                in  fromArchive arch 

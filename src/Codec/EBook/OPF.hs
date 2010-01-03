@@ -1,42 +1,22 @@
 -- Open Packaging Format 2.0
 
 module Codec.EBook.OPF (
-        OPF(..),
-        OPFEntry(..),
-	mkOPFXML
+	ncxXML,
+        opfXML
 ) 
 where
+import Data.Maybe (fromJust)
 import Text.XML.Light
-
-data OPF = OPF { 
-              opfBookID     :: String,
-              opfBookTitle  :: String,
-              opfBookAuthor :: String,
-	      opfLang       :: String,
-              opfEntries    :: [OPFEntry]
-           } deriving Show
-
-data OPFEntry = OPFEntry { 
-	            opfeID        :: String,
-		    opfeHRef      :: String,
-		    opfeMediaType :: String }
-              | OPFEntryChapter { 
-	            opfeID            :: String,
-		    opfeHRef          :: String,
-		    opfeMediaType     :: String,
-                    opfeChapterName   :: String } deriving Show
+import Codec.EBook.Types
+import qualified Data.ByteString.Lazy as B
+-- import Data.ByteString.Lazy.UTF8 as U
+import Codec.Binary.UTF8.String as U
 
 opfDefaultLang = "en"
 opfDefaultCreator = "Unknown"
 
-chapterEntries :: [OPFEntry] -> [OPFEntry]
-chapterEntries = filter (isChapter)
-   where
-      isChapter (OPFEntryChapter _ _ _ _) = True
-      isChapter _ = False
-
-mkNCXXML :: OPF -> String
-mkNCXXML o = ppTopElement packageT
+ncxXML :: Book -> B.ByteString
+ncxXML o = B.pack $ U.encode $ ppTopElement packageT
 	where
 	   packageT= add_attrs packageA $ unode "ncx" nestedT
            packageA = [ (Attr (unqual "version") "2005-1")
@@ -44,23 +24,23 @@ mkNCXXML o = ppTopElement packageT
 	               ,(Attr (unqual "xmlns")   "http://www.daisy.org/z3986/2005/ncx/") ]
            nestedT = [ headT, docTitleT, docAuthorT, navMapT ]
            headT = unode "head" $ map (\(n,v) -> add_attrs [ (Attr (unqual "name") n),(Attr (unqual "content") v)] $ unode "meta" ()) metaVals
-           metaVals = [ ("dtb:uid",(opfBookID o))
+           metaVals = [ ("dtb:uid",(bookID o))
                        ,("dtb:depth","1")
                        ,("dtb:totalPageCount","0") 
                        ,("dtb:maxPageNumber","0") ]
-           docTitleT = unode "docTitle" $ unode "text" (opfBookTitle o)
-           docAuthorT = unode "docAuthor" $ unode "text" (opfBookAuthor o)
-           numChapterEnt = zip (chapterEntries $ opfEntries o) [1..]
+           docTitleT = unode "docTitle" $ unode "text" (bookTitle o)
+           docAuthorT = unode "docAuthor" $ unode "text" (bookAuthor o)
+           numChapterEnt = zip (chapterItems $ bookItems o) [1..]
            navMapT = unode "navMap" (map navPointT numChapterEnt)
            navPointT (e,i) = add_attrs [ (Attr (unqual "class") "chapter") 
-                                        ,(Attr (unqual "id") (opfeID e))
+                                        ,(Attr (unqual "id") (itemID e))
                                         ,(Attr (unqual "playOrder") (show i)) 
-                                      ] $ unode "navPoint" [ unode "navLabel" $ unode "text" (opfeChapterName e)
-                                                            ,add_attr (Attr (unqual "src") (opfeHRef e) ) $ unode "content" ()
+                                      ] $ unode "navPoint" [ unode "navLabel" $ unode "text" (chapterTitle (fromJust $ itemMetadata e))
+                                                            ,add_attr (Attr (unqual "src") (itemFileName e) ) $ unode "content" ()
 					  	           ]
 
-mkOPFXML :: OPF -> String
-mkOPFXML o = ppTopElement packageT
+opfXML :: Book -> B.ByteString
+opfXML o = B.pack $ U.encode $ ppTopElement packageT
 	where
 	   packageT= add_attrs packageA $ unode "package" nestedT
            packageA = [ (Attr (unqual "version") "2.0")
@@ -68,20 +48,20 @@ mkOPFXML o = ppTopElement packageT
 	               ,(Attr (unqual "xmlns")   "http://www.idpf.org/2007/opf") ]
            nestedT = [ metadataT, manifestT, spineT ]
            metadataT = add_attrs metadataA $ unode "metadata" [
-                            unode "dc:title" (opfBookTitle o),
-                            unode "dc:language" (opfLang o),
+                            unode "dc:title" (bookTitle o),
+                            unode "dc:language" (bookLang o),
                             add_attrs [ (Attr (unqual "id") "BookId"), 
                                         (Attr (unqual "opf:scheme") "URI") 
-                                      ] $ unode "dc:identifier" (opfBookID o)
+                                      ] $ unode "dc:identifier" (bookID o)
                        ]
            metadataA = [ (Attr (unqual "xmlns:dc")  "http://purl.org/dc/elements/1.1/") 
                         ,(Attr (unqual "xmlns:opf") "http://www.idpf.org/2007/opf")
             	       ]
- 	   manifestT = unode "manifest" (map manifestItemT (opfEntries o))
-           manifestItemT (OPFEntry bID bHref bMedia) = add_attrs [ (Attr (unqual "id") bID) 
-                                                                  ,(Attr (unqual "href") bHref)
-                                                                  ,(Attr (unqual "media-type") bMedia) 
-				                                 ] $ unode "item" ()
-           spineT = add_attrs [ (Attr (unqual "toc") "ncx") ] $ unode "spine" (map spineItemT (opfEntries o))
-           spineItemT (OPFEntry bID _ _) = add_attrs [ (Attr (unqual "idref") bID) ] $ unode "itemref" ()
+ 	   manifestT = unode "manifest" (map manifestItemT (bookItems o))
+           manifestItemT i = add_attrs [ (Attr (unqual "id") (itemID i)) 
+                                        ,(Attr (unqual "href") (itemFileName i))
+                                        ,(Attr (unqual "media-type") (itemMediaType i)) 
+                                       ] $ unode "item" ()
+           spineT = add_attrs [ (Attr (unqual "toc") "ncx") ] $ unode "spine" (map spineItemT (bookItems o))
+           spineItemT i = add_attrs [ (Attr (unqual "idref") (itemID i)) ] $ unode "itemref" ()
 
