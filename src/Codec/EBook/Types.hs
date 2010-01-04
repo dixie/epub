@@ -7,10 +7,12 @@ module Codec.EBook.Types (
    emptyBook,
    addItem2Book,
    bookFiles,
-   chapterItems
+   chapterItems,
+   str2bstr
 ) 
 where
 import qualified Data.ByteString.Lazy as B
+import qualified Data.ByteString.Lazy.Char8 as U
 
 data Book = Book { 
                bookID     :: String,
@@ -31,6 +33,9 @@ data BookItem = BookItem {
 data Metadata = ChapterMetadata {
                 chapterTitle :: String
             } deriving (Show, Eq, Ord)
+
+str2bstr :: String -> B.ByteString
+str2bstr x = U.pack x
 
 emptyBook :: Book
 emptyBook = Book "NO ID" "NO TITLE" "NO AUTHOR" "en" []

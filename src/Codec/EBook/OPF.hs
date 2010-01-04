@@ -9,14 +9,12 @@ import Data.Maybe (fromJust)
 import Text.XML.Light
 import Codec.EBook.Types
 import qualified Data.ByteString.Lazy as B
--- import Data.ByteString.Lazy.UTF8 as U
-import Codec.Binary.UTF8.String as U
 
 opfDefaultLang = "en"
 opfDefaultCreator = "Unknown"
 
 ncxXML :: Book -> B.ByteString
-ncxXML o = B.pack $ U.encode $ ppTopElement packageT
+ncxXML o = str2bstr $ ppTopElement packageT
 	where
 	   packageT= add_attrs packageA $ unode "ncx" nestedT
            packageA = [ (Attr (unqual "version") "2005-1")
@@ -40,7 +38,7 @@ ncxXML o = B.pack $ U.encode $ ppTopElement packageT
 					  	           ]
 
 opfXML :: Book -> B.ByteString
-opfXML o = B.pack $ U.encode $ ppTopElement packageT
+opfXML o = str2bstr $ ppTopElement packageT
 	where
 	   packageT= add_attrs packageA $ unode "package" nestedT
            packageA = [ (Attr (unqual "version") "2.0")

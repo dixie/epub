@@ -9,9 +9,9 @@ module Codec.EBook.OCF(
        )
 where
 
+import Codec.EBook.Types
 import Text.XML.Light
 import Codec.Archive.Zip
-import Codec.Binary.UTF8.String as U
 import qualified Data.ByteString.Lazy as B
 
 defaultMediatype = "application/oebps-package+xml"
@@ -21,10 +21,10 @@ containerXMLFile' :: FilePath -> (FilePath, B.ByteString)
 containerXMLFile' p = containerXMLFile p defaultMediatype
 
 mimetypeFile :: (FilePath, B.ByteString)
-mimetypeFile = ("mimetype", B.pack $ U.encode $ defaultMimetype)
+mimetypeFile = ("mimetype", str2bstr defaultMimetype)
 
 containerXMLFile :: FilePath -> String -> (FilePath, B.ByteString)
-containerXMLFile p m = ("META-INF/container.xml", B.pack $ U.encode $ ppTopElement contTag)
+containerXMLFile p m = ("META-INF/container.xml", str2bstr $ ppTopElement contTag)
 	where
 	   contTag = add_attrs contAttrs $ unode "container" rootfilesTag
            contAttrs = [ (Attr (unqual "version") "1.0")
