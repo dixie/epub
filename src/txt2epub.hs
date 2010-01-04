@@ -8,5 +8,6 @@ main = do
      bookTitle = "Macka a Pes"
   }
   print book
-  print $ book2Str book
-  B.writeFile "book.epub" (book2Str book) 
+  outdata <- book2Str' book
+  print outdata
+  B.writeFile "book.epub" outdata
