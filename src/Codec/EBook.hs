@@ -7,7 +7,8 @@ module Codec.EBook (
     book2Str,
     book2Str',
     book2Arch',
-    book2Arch
+    book2Arch,
+    opsMediatype
 ) 
 where
 
@@ -17,6 +18,8 @@ import Codec.EBook.Types
 import Codec.EBook.OPF
 import Codec.EBook.OCF
 import qualified Data.ByteString.Lazy as B
+
+opsMediatype = "application/xhtml+xml"
 
 book2Str :: Book -> Integer -> B.ByteString
 book2Str book t = fromArchive (book2Arch book t) 
