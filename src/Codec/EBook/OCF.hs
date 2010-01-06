@@ -27,9 +27,9 @@ containerXMLFile :: FilePath -> String -> (FilePath, B.ByteString)
 containerXMLFile p m = ("META-INF/container.xml", str2bstr $ ppTopElement contTag)
 	where
 	   contTag = add_attrs contAttrs $ unode "container" rootfilesTag
-           contAttrs = [ (Attr (unqual "version") "1.0")
-			,(Attr (unqual "xmlns")   "urn:oasis:names:tc:opendocument:xmlns:container") ] 
+           contAttrs = [ Attr (unqual "version") "1.0"
+			,Attr (unqual "xmlns")   "urn:oasis:names:tc:opendocument:xmlns:container" ] 
            rootfilesTag = unode "rootfiles" (rootfileTag p m)
            rootfileTag p m = add_attrs (rfAttrs p m) $ unode "rootfile" ()
-           rfAttrs p m = [ (Attr (unqual "full-path") p)
-			  ,(Attr (unqual "media-type")  m) ] 
+           rfAttrs p m = [ Attr (unqual "full-path") p
+			  ,Attr (unqual "media-type")  m ] 

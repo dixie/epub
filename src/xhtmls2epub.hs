@@ -11,8 +11,8 @@ main = do
      bookAuthor = "Jozef Chroustal",
      bookTitle = "Macka a Pes"
   }
-  items <- mapM (loadItems) fileNames
-  let bookFull = foldl' (addItem2Book) book items
+  items <- mapM loadItems fileNames
+  let bookFull = foldl' addItem2Book book items
   print bookFull
   outdata <- book2Str' bookFull
   print outdata

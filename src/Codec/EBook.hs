@@ -22,7 +22,7 @@ import qualified Data.ByteString.Lazy as B
 opsMediatype = "application/xhtml+xml"
 
 book2Str :: Book -> Integer -> B.ByteString
-book2Str book t = fromArchive (book2Arch book t) 
+book2Str book = fromArchive . book2Arch book
 
 book2Str' :: Book -> IO B.ByteString
 book2Str' book = do 
@@ -39,7 +39,7 @@ book2Arch book t = let conXMLFile = containerXMLFile' opfFileName
                        opfFileName = "book.opf"
                        mimeFile   = mimetypeFile
                        contFiles  = bookFiles book
-                       allFiles   = mimeFile:conXMLFile:contFiles ++ (opfFiles book opfFileName)
+                       allFiles   = mimeFile:conXMLFile:contFiles ++ opfFiles book opfFileName
                        entries    = map (\(n,c) -> toEntry n t c) allFiles
                        arch       = foldl (\a e -> addEntryToArchive e a) emptyArchive entries
                    in  arch 

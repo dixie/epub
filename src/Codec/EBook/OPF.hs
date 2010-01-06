@@ -24,11 +24,11 @@ ncxXML :: Book -> B.ByteString
 ncxXML o = str2bstr $ ppTopElement packageT
 	where
 	   packageT= add_attrs packageA $ unode "ncx" nestedT
-           packageA = [ (Attr (unqual "version") "2005-1")
-                       ,(Attr (unqual "xml:lang") "en")
-	               ,(Attr (unqual "xmlns")   "http://www.daisy.org/z3986/2005/ncx/") ]
+           packageA = [ Attr (unqual "version") "2005-1"
+                       ,Attr (unqual "xml:lang") "en"
+	               ,Attr (unqual "xmlns")   "http://www.daisy.org/z3986/2005/ncx/" ]
            nestedT = [ headT, docTitleT, docAuthorT, navMapT ]
-           headT = unode "head" $ map (\(n,v) -> add_attrs [ (Attr (unqual "name") n),(Attr (unqual "content") v)] $ unode "meta" ()) metaVals
+           headT = unode "head" $ map (\(n,v) -> add_attrs [ Attr (unqual "name") n,Attr (unqual "content") v] $ unode "meta" ()) metaVals
            metaVals = [ ("dtb:uid",(bookID o))
                        ,("dtb:depth","1")
                        ,("dtb:totalPageCount","0") 
@@ -37,9 +37,9 @@ ncxXML o = str2bstr $ ppTopElement packageT
            docAuthorT = unode "docAuthor" $ unode "text" (bookAuthor o)
            numChapterEnt = zip (chapterItems $ bookItems o) [1..]
            navMapT = unode "navMap" (map navPointT numChapterEnt)
-           navPointT (e,i) = add_attrs [ (Attr (unqual "class") "chapter") 
-                                        ,(Attr (unqual "id") (itemID e))
-                                        ,(Attr (unqual "playOrder") (show i)) 
+           navPointT (e,i) = add_attrs [ Attr (unqual "class") "chapter" 
+                                        ,Attr (unqual "id") (itemID e)
+                                        ,Attr (unqual "playOrder") (show i) 
                                       ] $ unode "navPoint" [ unode "navLabel" $ unode "text" (chapterTitle (fromJust $ itemMetadata e))
                                                             ,add_attr (Attr (unqual "src") (itemFileName e) ) $ unode "content" ()
 					  	           ]
@@ -48,29 +48,29 @@ opfXML :: Book -> FilePath -> B.ByteString
 opfXML o xn = str2bstr $ ppTopElement packageT
 	where
 	   packageT= add_attrs packageA $ unode "package" nestedT
-           packageA = [ (Attr (unqual "version") "2.0")
-                       ,(Attr (unqual "unique-identifier") "BookId")
-	               ,(Attr (unqual "xmlns")   "http://www.idpf.org/2007/opf") ]
+           packageA = [ Attr (unqual "version") "2.0"
+                       ,Attr (unqual "unique-identifier") "BookId"
+	               ,Attr (unqual "xmlns")   "http://www.idpf.org/2007/opf" ]
            nestedT = [ metadataT, manifestT, spineT ]
            metadataT = add_attrs metadataA $ unode "metadata" [
                             unode "dc:title" (bookTitle o),
                             unode "dc:language" (bookLang o),
-                            add_attrs [ (Attr (unqual "id") "BookId"), 
-                                        (Attr (unqual "opf:scheme") "URI") 
+                            add_attrs [ Attr (unqual "id") "BookId" 
+                                       ,Attr (unqual "opf:scheme") "URI" 
                                       ] $ unode "dc:identifier" (bookID o)
                        ]
-           metadataA = [ (Attr (unqual "xmlns:dc")  "http://purl.org/dc/elements/1.1/") 
-                        ,(Attr (unqual "xmlns:opf") "http://www.idpf.org/2007/opf")
+           metadataA = [ Attr (unqual "xmlns:dc")  "http://purl.org/dc/elements/1.1/" 
+                        ,Attr (unqual "xmlns:opf") "http://www.idpf.org/2007/opf"
             	       ]
- 	   manifestT = unode "manifest" $ (map manifestItemT (bookItems o)) ++ [ncxItem]
-           manifestItemT i = add_attrs [ (Attr (unqual "id") (itemID i)) 
-                                        ,(Attr (unqual "href") (itemFileName i))
-                                        ,(Attr (unqual "media-type") (itemMediaType i)) 
+ 	   manifestT = unode "manifest" $ map manifestItemT (bookItems o) ++ [ncxItem]
+           manifestItemT i = add_attrs [ Attr (unqual "id") (itemID i) 
+                                        ,Attr (unqual "href") (itemFileName i)
+                                        ,Attr (unqual "media-type") (itemMediaType i) 
                                        ] $ unode "item" ()
-           ncxItem = add_attrs [ (Attr (unqual "id") "ncx") 
-                                        ,(Attr (unqual "href") xn)
-                                        ,(Attr (unqual "media-type") "application/x-dtbncx+xml") 
+           ncxItem = add_attrs [ Attr (unqual "id") "ncx" 
+                                ,Attr (unqual "href") xn
+                                ,Attr (unqual "media-type") "application/x-dtbncx+xml" 
                                        ] $ unode "item" ()
-           spineT = add_attrs [ (Attr (unqual "toc") "ncx") ] $ unode "spine" (map spineItemT (bookItems o))
-           spineItemT i = add_attrs [ (Attr (unqual "idref") (itemID i)) ] $ unode "itemref" ()
+           spineT = add_attrs [ Attr (unqual "toc") "ncx" ] $ unode "spine" (map spineItemT (bookItems o))
+           spineItemT i = add_attrs [ Attr (unqual "idref") (itemID i) ] $ unode "itemref" ()
 

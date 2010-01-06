@@ -35,16 +35,16 @@ data Metadata = ChapterMetadata {
             } deriving (Show, Eq, Ord)
 
 str2bstr :: String -> B.ByteString
-str2bstr x = U.pack x
+str2bstr = U.pack
 
 emptyBook :: Book
 emptyBook = Book "NO ID" "NO TITLE" "NO AUTHOR" "en" []
 
 bookFiles :: Book -> [(FilePath, B.ByteString)]
-bookFiles book = map (\x -> (itemFileName x, itemContent x)) (bookItems book)
+bookFiles = map (itemFileName Control.Arrow.&&& itemContent) . bookItems
 
 chapterItems :: [BookItem] -> [BookItem]
-chapterItems = filter (isChapter)
+chapterItems = filter isChapter
    where
       isChapter (BookItem _ _ _ _ Nothing ) = False
       isChapter _ = True
@@ -52,4 +52,4 @@ chapterItems = filter (isChapter)
 addItem2Book :: Book -> BookItem -> Book
 addItem2Book book item = book { bookItems = newItems }
        where
-          newItems = (bookItems book) ++ [item]
+          newItems = bookItems book ++ [item]
