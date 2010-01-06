@@ -13,6 +13,7 @@ module Codec.EBook.Types (
 where
 import qualified Data.ByteString.Lazy as B
 import qualified Data.ByteString.Lazy.Char8 as U
+import Control.Arrow ((&&&))
 
 data Book = Book { 
                bookID     :: String,
@@ -41,7 +42,7 @@ emptyBook :: Book
 emptyBook = Book "NO ID" "NO TITLE" "NO AUTHOR" "en" []
 
 bookFiles :: Book -> [(FilePath, B.ByteString)]
-bookFiles = map (itemFileName Control.Arrow.&&& itemContent) . bookItems
+bookFiles = map (itemFileName &&& itemContent) . bookItems
 
 chapterItems :: [BookItem] -> [BookItem]
 chapterItems = filter isChapter
