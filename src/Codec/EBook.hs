@@ -35,12 +35,11 @@ book2Arch' book = do
           return $ book2Arch book t
 
 book2Arch :: Book -> Integer -> Archive
-book2Arch book t = let ncxXMLFile = ("book.ncx",ncxXML book)
-                       opfXMLFile = ("book.opf",opfXML book)
-                       conXMLFile = containerXMLFile' "book.opf"
+book2Arch book t = let conXMLFile = containerXMLFile' opfFileName
+                       opfFileName = "book.opf"
                        mimeFile   = mimetypeFile
                        contFiles  = bookFiles book
-                       allFiles   = mimeFile:ncxXMLFile:conXMLFile:opfXMLFile:contFiles
+                       allFiles   = mimeFile:conXMLFile:contFiles ++ (opfFiles book opfFileName)
                        entries    = map (\(n,c) -> toEntry n t c) allFiles
                        arch       = foldl (\a e -> addEntryToArchive e a) emptyArchive entries
                    in  arch 

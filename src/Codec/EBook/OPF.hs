@@ -2,7 +2,8 @@
 
 module Codec.EBook.OPF (
 	ncxXML,
-        opfXML
+        opfXML,
+        opfFiles
 ) 
 where
 import Data.Maybe (fromJust)
@@ -12,6 +13,12 @@ import qualified Data.ByteString.Lazy as B
 
 opfDefaultLang = "en"
 opfDefaultCreator = "Unknown"
+
+opfFiles :: Book -> FilePath -> [(FilePath, B.ByteString)] 
+opfFiles book name = let ncxXMLFile = (ncxFileName,ncxXML book)
+                         opfXMLFile = (name,opfXML book ncxFileName)
+                         ncxFileName = "book.ncx"
+                     in [opfXMLFile, ncxXMLFile]
 
 ncxXML :: Book -> B.ByteString
 ncxXML o = str2bstr $ ppTopElement packageT
@@ -37,8 +44,8 @@ ncxXML o = str2bstr $ ppTopElement packageT
                                                             ,add_attr (Attr (unqual "src") (itemFileName e) ) $ unode "content" ()
 					  	           ]
 
-opfXML :: Book -> B.ByteString
-opfXML o = str2bstr $ ppTopElement packageT
+opfXML :: Book -> FilePath -> B.ByteString
+opfXML o xn = str2bstr $ ppTopElement packageT
 	where
 	   packageT= add_attrs packageA $ unode "package" nestedT
            packageA = [ (Attr (unqual "version") "2.0")
@@ -55,10 +62,14 @@ opfXML o = str2bstr $ ppTopElement packageT
            metadataA = [ (Attr (unqual "xmlns:dc")  "http://purl.org/dc/elements/1.1/") 
                         ,(Attr (unqual "xmlns:opf") "http://www.idpf.org/2007/opf")
             	       ]
- 	   manifestT = unode "manifest" (map manifestItemT (bookItems o))
+ 	   manifestT = unode "manifest" $ (map manifestItemT (bookItems o)) ++ [ncxItem]
            manifestItemT i = add_attrs [ (Attr (unqual "id") (itemID i)) 
                                         ,(Attr (unqual "href") (itemFileName i))
                                         ,(Attr (unqual "media-type") (itemMediaType i)) 
+                                       ] $ unode "item" ()
+           ncxItem = add_attrs [ (Attr (unqual "id") "ncx") 
+                                        ,(Attr (unqual "href") xn)
+                                        ,(Attr (unqual "media-type") "application/x-dtbncx+xml") 
                                        ] $ unode "item" ()
            spineT = add_attrs [ (Attr (unqual "toc") "ncx") ] $ unode "spine" (map spineItemT (bookItems o))
            spineItemT i = add_attrs [ (Attr (unqual "idref") (itemID i)) ] $ unode "itemref" ()
