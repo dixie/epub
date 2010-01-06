@@ -5,18 +5,21 @@ import System.FilePath
 import Data.List (foldl')
 
 main = do
-  fileNames <- getArgs
-  let book = emptyBook { 
-     bookID = "http://localhost/pokus",
-     bookAuthor = "Jozef Chroustal",
-     bookTitle = "Macka a Pes"
-  }
-  items <- mapM loadItems fileNames
-  let bookFull = foldl' addItem2Book book items
-  print bookFull
-  outdata <- book2Str' bookFull
-  print outdata
-  B.writeFile "book.epub" outdata
+  args <- getArgs
+  case args of 
+     (nameOfBook:fileNames) -> do 
+          let book = emptyBook { 
+                bookID = "http://localhost/"++nameOfBook,
+                bookAuthor = "xhtml2epub",
+                bookTitle = nameOfBook
+          }
+          items <- mapM loadItems fileNames
+          let bookFull = foldl' addItem2Book book items
+          let epubFName = nameOfBook++".epub"
+          outdata <- book2Str' bookFull
+          B.writeFile epubFName  outdata
+          putStrLn $ epubFName ++ " constructed."
+     _ -> error "Usage: xhtml2epub <name of book> <xhtml file1> [<xhtml file2>,...]"
 
 loadItems :: FilePath -> IO BookItem
 loadItems p = do
