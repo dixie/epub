@@ -25,7 +25,7 @@ Library
                    bytestring,      
                    zip-archive,
                    xml,
-                   Cabal        >= 1.5 && < 1.7
+                   Cabal        >= 1.5 && < 1.9
   Hs-Source-Dirs:  src
   Extensions:      CPP, PatternGuards
   Ghc-Options:      -Wall -fno-warn-orphans
