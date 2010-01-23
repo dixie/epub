@@ -36,6 +36,6 @@ Library
         Codec.EBook.OCF
         Codec.EBook.OPF
 
-Executable xhtmls2epub
+Executable xhtml2epub
   Hs-Source-Dirs:  src
-  Main-Is:         xhtmls2epub.hs
+  Main-Is:         xhtml2epub.hs
