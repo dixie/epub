@@ -16,7 +16,7 @@ main = do
           items <- mapM loadItems fileNames
           let bookFull = foldl' addItem2Book book items
           let epubFName = nameOfBook++".epub"
-          outdata <- book2Str' bookFull
+          outdata <- book2Bin' bookFull
           B.writeFile epubFName  outdata
           putStrLn $ epubFName ++ " constructed."
      _ -> error "Usage: xhtml2epub <name of book> <xhtml file1> [<xhtml file2>,...]"
