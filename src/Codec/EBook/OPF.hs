@@ -71,6 +71,6 @@ opfXML o xn = str2bstr $ ppTopElement packageT
                                 ,Attr (unqual "href") xn
                                 ,Attr (unqual "media-type") "application/x-dtbncx+xml" 
                                        ] $ unode "item" ()
-           spineT = add_attrs [ Attr (unqual "toc") "ncx" ] $ unode "spine" (map spineItemT (bookItems o))
+           spineT = add_attrs [ Attr (unqual "toc") "ncx" ] $ unode "spine" (map spineItemT (chapterItems $ bookItems o))
            spineItemT i = add_attrs [ Attr (unqual "idref") (itemID i) ] $ unode "itemref" ()
 
