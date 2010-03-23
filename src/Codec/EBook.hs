@@ -44,7 +44,7 @@ book2Arch book t = let conXMLFile = containerXMLFile' opfFileName
                        opfFileName = "book.opf"
                        mimeFile   = mimetypeFile
                        contFiles  = bookFiles book
-                       allFiles   = mimeFile:conXMLFile:contFiles ++ opfFiles book opfFileName
+                       allFiles   = conXMLFile:contFiles ++ opfFiles book opfFileName ++ [mimeFile]
                        entries    = map (\(n,c) -> toEntry n t c) allFiles
                        arch       = foldl (\a e -> addEntryToArchive e a) emptyArchive entries
                    in  arch 
