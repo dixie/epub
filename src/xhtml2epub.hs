@@ -24,6 +24,6 @@ main = do
 loadItems :: FilePath -> IO BookItem
 loadItems p = do
    c <- B.readFile p
-   return (BookItem ("http://localhost/"++np) np c opsMediatype (Just (ChapterMetadata np))) 
+   return (BookItem ("localhost-"++np) np c opsMediatype (Just (ChapterMetadata np))) 
    where
       np = normalise p
