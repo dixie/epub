@@ -13,7 +13,7 @@ main = do
                 bookAuthor = "xhtml2epub",
                 bookTitle = nameOfBook
           }
-          items <- mapM loadItems fileNames
+          items <- mapM loadItems $ zip fileNames [1..]
           let bookFull = foldl' addItem2Book book items
           let epubFName = nameOfBook++".epub"
           outdata <- book2Bin' bookFull
@@ -21,9 +21,12 @@ main = do
           putStrLn $ epubFName ++ " constructed."
      _ -> error "Usage: xhtml2epub <name of book> <xhtml file1> [<xhtml file2>,...]"
 
-loadItems :: FilePath -> IO BookItem
-loadItems p = do
+-- | Constructs a book item from a given filename and item index. The
+-- index is used to generate a unique item identifier.
+loadItems :: (FilePath,Int) -> IO BookItem
+loadItems (p,i) = do
    c <- B.readFile p
-   return (BookItem ("localhost-"++np) np c opsMediatype (Just (ChapterMetadata np))) 
+   return (BookItem iid np c opsMediatype (Just (ChapterMetadata np)))
    where
       np = normalise p
+      iid = takeBaseName p ++ "-" ++ show i
