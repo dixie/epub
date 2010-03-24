@@ -15,7 +15,7 @@ main = do
           }
           items <- mapM loadItems $ zip fileNames [1..]
           let bookFull = foldl' addItem2Book book items
-          let epubFName = nameOfBook++".epub"
+          let epubFName = nameOfBook <.> "epub"
           outdata <- book2Bin' bookFull
           B.writeFile epubFName  outdata
           putStrLn $ epubFName ++ " constructed."
