@@ -20,6 +20,7 @@ import Codec.EBook.OCF
 import qualified Data.ByteString.Lazy as B
 
 -- EPUB media type
+opsMediatype :: String
 opsMediatype = "application/xhtml+xml"
 
 -- Serialize Book to binary EPUB Format

@@ -11,7 +11,10 @@ import Text.XML.Light
 import Codec.EBook.Types
 import qualified Data.ByteString.Lazy as B
 
+opfDefaultLang :: String
 opfDefaultLang = "en"
+
+opfDefaultCreator :: String
 opfDefaultCreator = "Unknown"
 
 opfFiles :: Book -> FilePath -> [(FilePath, B.ByteString)] 
@@ -31,11 +34,11 @@ ncxXML o = str2bstr $ ppTopElement packageT
            headT = unode "head" $ map (\(n,v) -> add_attrs [ Attr (unqual "name") n,Attr (unqual "content") v] $ unode "meta" ()) metaVals
            metaVals = [ ("dtb:uid",(bookID o))
                        ,("dtb:depth","1")
-                       ,("dtb:totalPageCount","0") 
+                       ,("dtb:totalPageCount","0")
                        ,("dtb:maxPageNumber","0") ]
            docTitleT = unode "docTitle" $ unode "text" (bookTitle o)
            docAuthorT = unode "docAuthor" $ unode "text" (bookAuthor o)
-           numChapterEnt = zip (chapterItems $ bookItems o) [1..]
+           numChapterEnt = zip (chapterItems $ bookItems o) [(1::Int)..]
            navMapT = unode "navMap" (map navPointT numChapterEnt)
            navPointT (e,i) = add_attrs [ Attr (unqual "class") "chapter" 
                                         ,Attr (unqual "id") (itemID e)

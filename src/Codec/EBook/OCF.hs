@@ -11,10 +11,12 @@ where
 
 import Codec.EBook.Types
 import Text.XML.Light
-import Codec.Archive.Zip
 import qualified Data.ByteString.Lazy as B
 
+defaultMediatype :: String
 defaultMediatype = "application/oebps-package+xml"
+
+defaultMimetype :: String
 defaultMimetype = "application/epub+zip"
 
 containerXMLFile' :: FilePath -> (FilePath, B.ByteString)
@@ -28,8 +30,9 @@ containerXMLFile p m = ("META-INF/container.xml", str2bstr $ ppTopElement contTa
 	where
 	   contTag = add_attrs contAttrs $ unode "container" rootfilesTag
            contAttrs = [ Attr (unqual "version") "1.0"
-			,Attr (unqual "xmlns")   "urn:oasis:names:tc:opendocument:xmlns:container" ] 
-           rootfilesTag = unode "rootfiles" (rootfileTag p m)
-           rootfileTag p m = add_attrs (rfAttrs p m) $ unode "rootfile" ()
-           rfAttrs p m = [ Attr (unqual "full-path") p
-			  ,Attr (unqual "media-type")  m ] 
+                       , Attr (unqual "xmlns")   "urn:oasis:names:tc:opendocument:xmlns:container" ]
+           rootfilesTag = unode "rootfiles" rootfileTag
+           rootfileTag = add_attrs rfAttrs $ unode "rootfile" ()
+           rfAttrs = [ Attr (unqual "full-path") p
+                     , Attr (unqual "media-type") m
+                     ]

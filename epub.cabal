@@ -31,7 +31,6 @@ Library
                    xml,
                    Cabal        >= 1.5 && < 1.9
   Hs-Source-Dirs:  src
-  Extensions:      CPP, PatternGuards
   Ghc-Options:      -Wall -fno-warn-orphans
 
   Exposed-modules:
