@@ -22,7 +22,6 @@ Source-Repository head
 Library
   Build-Depends:   base         < 5,
                    filepath,
-                   haskell98,
                    old-time,
                    utf8-string,
                    bytestring,      
