@@ -1,5 +1,5 @@
 Name:            epub
-Version:         0.0.6
+Version:         0.0.7
 License:         BSD3
 License-File:    LICENSE
 Synopsis:        EPUB E-Book construction support library
