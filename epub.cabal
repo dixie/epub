@@ -21,7 +21,7 @@ Cabal-Version:   >= 1.6
 
 Source-Repository head
   type:     darcs
-  location: darcsden.com/dixie/epub
+  location: http://darcsden.com/dixie/epub
     
 Library
   Build-Depends:   base         < 5,
